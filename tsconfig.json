@@ -1,16 +1,18 @@
 {
-	"compilerOptions": {
-		"strict": true,
-		"isolatedModules": true,
-		"esModuleInterop": true,
-		"moduleResolution": "Bundler",
-		"skipLibCheck": true,
-		"noEmit": true,
-		"module": "esnext",
-		"target": "esnext"
-	},
-	"include": [
-		"src"
-	]
-
+  "compilerOptions": {
+    "strict": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "module": "esnext",
+    "moduleResolution": "node", // "Bundler" is not a valid option for "moduleResolution"
+    "target": "esnext",
+    "outDir": "dist"
+  },
+	"include": ["src/**/*"],
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  }
 }

@@ -16,7 +16,7 @@ const main = async () => {
       }
     }),
   ]
-  const server = new Server()
+  const server = new Server(eventList)
   server.start(8888)
    
 

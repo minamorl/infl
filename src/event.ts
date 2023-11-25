@@ -11,6 +11,7 @@ export interface InflEventInput {
   timestamp: number;
   publisher: string;
   data: Record<string, any>;
+  isActive: boolean
 }
 
 export class Event {
@@ -19,13 +20,23 @@ export class Event {
   #timestamp: number;
   #publisher: string;
   #data: Record<string, any>;
+  #isActive: boolean
 
-  constructor({ id, type, timestamp, publisher, data }: InflEventInput) {
+  constructor({ id, type, timestamp, publisher, data, isActive }: InflEventInput) {
     this.#id = id; // Generate uuid
     this.#type = type;
     this.#publisher = publisher;
     this.#timestamp = timestamp;
     this.#data = data;
+    this.#isActive = isActive;
+  }
+
+  archive() {
+    this.#isActive = false
+  }
+
+  get isActive() {
+    return this.#isActive
   }
 
   get id() {
@@ -66,6 +77,7 @@ export class Event {
       publisher: this.publisher,
       timestamp: this.timestamp,
       data: this.data,
+      isActive: this.isActive
     };
   }
 }
@@ -74,11 +86,12 @@ export const createEvent = ({
   type,
   publisher,
   data,
-}: Omit<InflEventInput, "id" | "timestamp">) =>
+}: Omit<InflEventInput, "id" | "timestamp" | "isActive">) =>
   new Event({
     id: uuidv4(),
     type,
     timestamp: Date.now(),
     publisher,
     data,
+    isActive: true
   });

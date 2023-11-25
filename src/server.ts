@@ -1,13 +1,17 @@
 import { Server as sio } from 'socket.io';
 import http from 'http';
 import { Event } from './event';
+import { CID } from 'multiformats';
 
 export class Server {
   #server: http.Server;
   #io: sio;
+  #eventList: Event[];
 
-  constructor() {
+  constructor(eventList: Event[]) {
     this.#server = http.createServer();
+    this.#eventList = eventList
+    console.log(eventList)
     this.#io = new sio(this.#server)
     this.#io.on('connection', (socket) => {
       console.log('a user connected');
@@ -15,14 +19,32 @@ export class Server {
       socket.on('event', (message) => {
         const event = this.parse(message)
         if (!event) return
-        // pass it to all clients
-        this.#io.emit('event', event.toJSON())
-        console.log('event', event.toJSON())
+        this.#eventList.push(event)
+        this.emit(event)
+      });
+      socket.on('inquiry', async (message) => {
+        const event = await this.inquiry(message)
+        if (!event) return
+        this.#eventList.push(event)
+        this.emit(event)
       });
       socket.on('disconnect', () => {
         console.log('user disconnected');
       });
     })
+  }
+  async inquiry(cid: string) {
+    const event = await Event.fromCID(cid)
+    if (!event) return 
+    return event
+  }
+  emit(event: Event) {
+    console.log('event', event.toJSON())
+    return this.#io.emit('event', event.toJSON())
+  }
+  // emit all
+  emitAll() {
+    return this.#eventList.map(event => this.emit(event))
   }
   private parse(message: string) {
     try {
@@ -33,15 +55,13 @@ export class Server {
     }
   }
 
-  public start(port: number) {
+  start(port: number) {
     this.#server.listen(port, () => {
       console.log(`🚀Server started on port ${port}`);
     });
   }
 
-  public stop() {
+  stop() {
     this.#server.close();
   }
-
-
 }
