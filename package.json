@@ -1,0 +1,32 @@
+{
+  "name": "infl",
+  "version": "0.0.1",
+  "description": "Alt WEB",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "tsx ./src/main",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "minamorl",
+  "license": "MIT",
+  "dependencies": {
+    "@helia/json": "^1.0.3",
+    "@helia/unixfs": "^1.4.2",
+    "@orbitdb/core": "^1.0.1",
+    "@types/uuid": "^9.0.7",
+    "blockstore-core": "^4.3.4",
+    "blockstore-fs": "^1.1.6",
+    "esbuild": "^0.19.7",
+    "helia": "^2.1.0",
+    "socket.io": "^4.7.2",
+    "socket.io-client": "^4.7.2",
+    "tsx": "^4.5.0",
+    "uuid": "^9.0.1",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.2"
+  }
+}
