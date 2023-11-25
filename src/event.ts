@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { FsBlockstore } from "blockstore-fs";
 import { CID } from "multiformats";
 
+const blockstore = new FsBlockstore('./data')
 // InflEvent is a base type of infl database
 export interface InflEventInput {
   id: string;
@@ -48,12 +49,12 @@ export class Event {
   }
 
   save() {
-    const j = json({blockstore: new FsBlockstore('./data')})
+    const j = json({blockstore})
     j.add(this.toJSON())
   }
 
   static async fromCID(cid: string) {
-    const j = json({blockstore: new FsBlockstore('./data')})
+    const j = json({blockstore})
     const event = await j.get<InflEventInput>(CID.parse(cid))
     return new Event(event)
   }

@@ -3,20 +3,20 @@ import http from 'http';
 import { Event } from './event';
 
 export class Server {
-  private server: http.Server;
-  private io: sio;
+  #server: http.Server;
+  #io: sio;
 
   constructor() {
-    this.server = http.createServer();
-    this.io = new sio(this.server)
-    this.io.on('connection', (socket) => {
+    this.#server = http.createServer();
+    this.#io = new sio(this.#server)
+    this.#io.on('connection', (socket) => {
       console.log('a user connected');
       // get event from client
       socket.on('event', (message) => {
         const event = this.parse(message)
         if (!event) return
         // pass it to all clients
-        this.io.emit('event', event.toJSON())
+        this.#io.emit('event', event.toJSON())
         console.log('event', event.toJSON())
       });
       socket.on('disconnect', () => {
@@ -34,13 +34,13 @@ export class Server {
   }
 
   public start(port: number) {
-    this.server.listen(port, () => {
+    this.#server.listen(port, () => {
       console.log(`🚀Server started on port ${port}`);
     });
   }
 
   public stop() {
-    this.server.close();
+    this.#server.close();
   }
 
 
