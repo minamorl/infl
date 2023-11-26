@@ -6,22 +6,30 @@ import createClient from "socket.io-client";
 
 
 const main = async () => {
-  const eventList = [
-    createEvent({
+  const eventList = [] as Event[]
+  const server = new Server(eventList)
+  const j = json({
+    blockstore: new FsBlockstore('./data')
+  })
+  server.start(8888)
+
+  // archive all events every 60 seconds
+  setInterval(() => {
+    const event = createEvent({
       type: 'create-new-post',
       publisher: 'user:1',
       data: {
         title: 'Hello World',
         content: 'This is my first post'
       }
-    }),
-  ]
-  const server = new Server(eventList)
-  server.start(8888)
+    }).toJSON()
+    client.emit('event', JSON.stringify(event))
+    j.add(event)
+    server.archiveAll()
+  }, 1000)
    
 
   const client = createClient('http://localhost:8888')
-  client.emit('event', JSON.stringify(eventList[0].toJSON()))
 }
 
 main()

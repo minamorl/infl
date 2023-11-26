@@ -44,7 +44,7 @@ export class Event {
   }
 
   get publisher() {
-    return this.#publisher.toString();
+    return this.#publisher;
   }
 
   get type() {

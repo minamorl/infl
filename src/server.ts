@@ -1,7 +1,8 @@
 import { Server as sio } from 'socket.io';
 import http from 'http';
-import { Event } from './event';
+import { Event, InflEventInput } from './event';
 import { CID } from 'multiformats';
+import { filter } from './filter';
 
 export class Server {
   #server: http.Server;
@@ -12,20 +13,27 @@ export class Server {
     this.#server = http.createServer();
     this.#eventList = eventList
     console.log(eventList)
-    this.#io = new sio(this.#server)
+    this.#io = new sio(this.#server, {
+      cors: {
+        origin: '*',
+        methods: ["GET", "POST"]
+      }
+    })
+    // cors
     this.#io.on('connection', (socket) => {
       console.log('a user connected');
       // get event from client
       socket.on('event', (message) => {
-        const event = this.parse(message)
-        if (!event) return
-        this.#eventList.push(event)
-        this.emit(event)
+        try {
+          const event = new Event(JSON.parse(message))
+          if (!event) return
+          this.emit(event)
+        } finally {
+        }
       });
       socket.on('inquiry', async (message) => {
         const event = await this.inquiry(message)
         if (!event) return
-        this.#eventList.push(event)
         this.emit(event)
       });
       socket.on('disconnect', () => {
@@ -38,23 +46,18 @@ export class Server {
     if (!event) return 
     return event
   }
+  archiveAll() {
+    this.#eventList.map(event => event.archive())
+  }
   emit(event: Event) {
     console.log('event', event.toJSON())
+    this.#eventList.push(event)
     return this.#io.emit('event', event.toJSON())
   }
   // emit all
   emitAll() {
     return this.#eventList.map(event => this.emit(event))
   }
-  private parse(message: string) {
-    try {
-      const event = new Event(JSON.parse(message))
-      return event
-    } catch (error) {
-      console.error('Error parsing event', error)
-    }
-  }
-
   start(port: number) {
     this.#server.listen(port, () => {
       console.log(`🚀Server started on port ${port}`);
